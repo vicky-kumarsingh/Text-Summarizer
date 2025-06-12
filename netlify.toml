@@ -7,12 +7,6 @@ publish = "static"
   [functions.api]
     path = "app.py"
     handler = "app.app"
-    environment = {
-      FLASK_APP = "app.py"
-      FLASK_ENV = "production"
-      FLASK_RUN_HOST = "0.0.0.0"
-      FLASK_RUN_PORT = "8000"
-    }
 
 [context.production.environment]
 FLASK_APP = "app.py"
@@ -31,11 +25,6 @@ for = "/*"
     Access-Control-Allow-Origin = "*"
     Access-Control-Allow-Methods = "GET,POST,PUT,DELETE,OPTIONS"
     Access-Control-Allow-Headers = "Content-Type,Authorization"
-
-[[redirects]]
-from = "/*"
-to = "/index.html"
-status = 200
 
   from = "/*"
   to = "/index.html"
