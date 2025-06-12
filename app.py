@@ -32,7 +32,12 @@ def handler(event, context):
                 import json
                 data = json.loads(body)
             except json.JSONDecodeError:
-                pass
+                return {
+                    'statusCode': 400,
+                    'body': json.dumps({
+                        'error': 'Invalid JSON'
+                    })
+                }
         
         # Get the text from the request
         text = data.get('text', '')

@@ -1,7 +1,7 @@
 [build]
 base = "/"
 command = "pip install -r requirements.txt"
-publish = "static"
+publish = "."
 
 [functions]
   [functions.api]
@@ -13,18 +13,6 @@ FLASK_APP = "app.py"
 FLASK_ENV = "production"
 FLASK_RUN_HOST = "0.0.0.0"
 FLASK_RUN_PORT = "8000"
-
-[[redirects]]
-from = "/api/*"
-to = "/.netlify/functions/api/:splat"
-status = 200
-
-[[headers]]
-for = "/.netlify/functions/*"
-  [headers.values]
-    Access-Control-Allow-Origin = "*"
-    Access-Control-Allow-Methods = "GET,POST,PUT,DELETE,OPTIONS"
-    Access-Control-Allow-Headers = "Content-Type,Authorization"
 
 [[redirects]]
 from = "/api/*"
