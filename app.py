@@ -149,9 +149,9 @@ def index():
                 <h1>Text Summarizer</h1>
                 <textarea id="inputText" placeholder="Enter text to summarize"></textarea>
                 <button onclick="summarize()">Summarize</button>
-                <div class="summary-container" id="summaryContainer">
+                <div class="summary-container" id="summaryContainer" style="display: none;">
                     <h2>Summary:</h2>
-                    <textarea id="summaryText" placeholder="Summary will appear here"></textarea>
+                    <textarea id="summaryText" placeholder="Summary will appear here" readonly></textarea>
                 </div>
                 <div id="errorMessage" class="error-message"></div>
             </div>
@@ -160,6 +160,7 @@ def index():
                 async function summarize() {
                     const inputText = document.getElementById('inputText').value.trim();
                     const summaryText = document.getElementById('summaryText');
+                    const summaryContainer = document.getElementById('summaryContainer');
                     const errorMessage = document.getElementById('errorMessage');
                     
                     if (!inputText) {
@@ -169,6 +170,8 @@ def index():
 
                     try {
                         errorMessage.textContent = '';
+                        summaryContainer.style.display = 'block';
+                        
                         const response = await fetch('/.netlify/functions/api/summarize', {
                             method: 'POST',
                             headers: {
@@ -188,6 +191,7 @@ def index():
                     } catch (error) {
                         errorMessage.textContent = 'Error generating summary';
                         console.error('Error:', error);
+                        summaryContainer.style.display = 'none';
                     }
                 }
             </script>
