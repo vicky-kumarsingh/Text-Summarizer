@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Install Python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir gunicorn flask flask-cors sumy
+RUN pip install --no-cache-dir gunicorn flask flask-cors
 
 # Copy application code
 COPY app.py .
