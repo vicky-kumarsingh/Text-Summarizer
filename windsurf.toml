@@ -1,0 +1,24 @@
+[build]
+image = "vickysingh535/text-summarizer:latest"
+
+[deploy]
+name = "text-summarizer"
+region = "us-east-1"
+
+[env]
+FLASK_APP = "app.py"
+FLASK_ENV = "production"
+FLASK_RUN_HOST = "0.0.0.0"
+
+[ports]
+web = 5000
+
+[resources]
+memory = "512MB"
+cpu = "512m"
+
+[healthcheck]
+path = "/"
+interval = "30s"
+timeout = "10s"
+retries = 3
