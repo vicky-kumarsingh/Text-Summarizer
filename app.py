@@ -84,17 +84,20 @@ def handler(event, context):
 
 # For local testing
 if __name__ == '__main__':
-    from flask import Flask, request, jsonify
     app = Flask(__name__)
     
     @app.route('/api/summarize', methods=['POST'])
     def summarize():
-        event = {
-            'body': request.get_data(as_text=True)
-        }
-        response = handler(event, None)
-        return response['body'], response['statusCode'], response['headers']
-
+        try:
+            data = request.get_json()
+            if not data or 'text' not in data:
+                return jsonify({'error': 'No text provided'}), 400
+                
+            summary = summarize_text(data['text'])
+            return jsonify({'summary': summary})
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+    
     @app.route('/', methods=['GET'])
     def index():
         return render_template_string('''
@@ -187,15 +190,23 @@ if __name__ == '__main__':
                             });
 
                             if (!response.ok) {
+                                const errorText = await response.text();
+                                console.error('Response error:', errorText);
                                 throw new Error('Failed to generate summary');
                             }
 
                             const data = await response.json();
+                            if (data.error) {
+                                errorMessage.textContent = data.error;
+                                summaryContainer.style.display = 'none';
+                                return;
+                            }
+                            
                             summaryText.value = data.summary;
                             summaryText.removeAttribute('readonly');
                         } catch (error) {
-                            errorMessage.textContent = 'Error generating summary';
                             console.error('Error:', error);
+                            errorMessage.textContent = 'Error generating summary';
                             summaryContainer.style.display = 'none';
                         }
                     }
