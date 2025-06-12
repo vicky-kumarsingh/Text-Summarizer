@@ -1,10 +1,6 @@
 from flask import Flask, request, jsonify, render_template_string
-from flask_cors import CORS
 import re
 import os
-
-app = Flask(__name__)
-CORS(app)
 
 def summarize_text(text, num_sentences=3):
     try:
@@ -24,19 +20,77 @@ def summarize_text(text, num_sentences=3):
     except Exception as e:
         return f"Error: {str(e)}"
 
-@app.route('/api/summarize', methods=['POST'])
-def summarize():
+def handler(event, context):
     try:
-        data = request.get_json()
-        if not data or 'text' not in data:
-            return jsonify({'error': 'No text provided'}), 400
-            
-        summary = summarize_text(data['text'])
-        return jsonify({'summary': summary})
+        # Get the request body
+        body = event.get('body', '')
+        
+        # Parse the JSON body
+        data = {}
+        if body:
+            try:
+                import json
+                data = json.loads(body)
+            except json.JSONDecodeError:
+                pass
+        
+        # Get the text from the request
+        text = data.get('text', '')
+        if not text:
+            return {
+                'statusCode': 400,
+                'body': json.dumps({
+                    'error': 'No text provided'
+                })
+            }
+        
+        # Generate summary
+        summary = summarize_text(text)
+        
+        # Return the response
+        return {
+            'statusCode': 200,
+            'body': json.dumps({
+                'summary': summary
+            }),
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type,Authorization'
+            }
+        }
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        import traceback
+        print(f"Error: {str(e)}")
+        print(traceback.format_exc())
+        return {
+            'statusCode': 500,
+            'body': json.dumps({
+                'error': str(e)
+            }),
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type,Authorization'
+            }
+        }
 
-@app.route('/', methods=['GET'])
+# For local testing
+if __name__ == '__main__':
+    from flask import Flask, request, jsonify
+    app = Flask(__name__)
+    
+    @app.route('/api/summarize', methods=['POST'])
+    def summarize():
+        event = {
+            'body': request.get_data(as_text=True)
+        }
+        response = handler(event, None)
+        return response['body'], response['statusCode'], response['headers']
+    
+    @app.route('/', methods=['GET'])
 def index():
     return render_template_string('''
         <!DOCTYPE html>
@@ -141,7 +195,7 @@ def index():
         </html>
     ''')
 
-if __name__ == '__main__':
-    port = int(os.environ.get('FLASK_RUN_PORT', 8000))
-    host = os.environ.get('FLASK_RUN_HOST', '0.0.0.0')
-    app.run(host=host, port=port)
+    if __name__ == '__main__':
+        port = int(os.environ.get('FLASK_RUN_PORT', 8000))
+        host = os.environ.get('FLASK_RUN_HOST', '0.0.0.0')
+        app.run(host=host, port=port)
