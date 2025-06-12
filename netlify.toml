@@ -1,16 +1,16 @@
 [build]
-  base = "/"
-  command = "pip install -r requirements.txt"
-  publish = "static"
+base = "/"
+command = "pip install -r requirements.txt"
+publish = "static"
 
 [functions]
   [functions.api]
     path = "app.py"
     handler = "app.app"
-    environment = { 
-      FLASK_APP = "app.py", 
-      FLASK_ENV = "production", 
-      FLASK_RUN_HOST = "0.0.0.0",
+    environment = {
+      FLASK_APP = "app.py"
+      FLASK_ENV = "production"
+      FLASK_RUN_HOST = "0.0.0.0"
       FLASK_RUN_PORT = "8000"
     }
 
@@ -21,18 +21,22 @@ FLASK_RUN_HOST = "0.0.0.0"
 FLASK_RUN_PORT = "8000"
 
 [[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/api/:splat"
-  status = 200
+from = "/api/*"
+to = "/.netlify/functions/api/:splat"
+status = 200
 
 [[headers]]
-  for = "/*"
+for = "/*"
   [headers.values]
     Access-Control-Allow-Origin = "*"
     Access-Control-Allow-Methods = "GET,POST,PUT,DELETE,OPTIONS"
     Access-Control-Allow-Headers = "Content-Type,Authorization"
 
 [[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
+
   from = "/*"
   to = "/index.html"
   status = 200
